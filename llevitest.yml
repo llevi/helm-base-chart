@@ -1,0 +1,81 @@
+---
+# Source: base/templates/ns.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: llevitest
+  labels:
+    name: llevitest
+---
+# Source: base/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: llevitest
+  name: llevitest
+spec:
+  ports:
+    - port: "80"
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: llevitest
+---
+# Source: base/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: llevitest
+  name: llevitest
+spec:
+  selector:
+    matchLabels:
+      app: llevitest
+  template:
+    metadata:
+      labels:
+        app: llevitest
+    spec:
+      containers:
+        - name: base
+          image: ngingx/nginx
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+---
+# Source: base/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: llevitest
+  name: llevitest
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-default-https@kubernetescrd
+spec:
+  rules:
+  - host: "llevitest.llev.es"
+    http:
+      paths:
+      - backend:
+          service:
+            name: "llevitest"
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - "llevitest.llev.es"
+    secretName: "llevitest.llev.es-tls"
