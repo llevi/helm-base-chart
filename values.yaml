@@ -1,2 +1,5 @@
 name: llevitest2 
 repo: nginx
+env:
+  ASD_HOST: qwe
+  QWE_PASS: aqqq
