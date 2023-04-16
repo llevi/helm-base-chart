@@ -15,6 +15,11 @@ spec:
       containers:
         - name: {{ .Chart.Name}}
           image: {{ .Values.repo }}
+          {{ if (.Values.storage) }}
+          volumeMounts:
+          - mountPath: {{ .Values.storage.path }}
+            name: {{ .Values.name }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.port | default 80 }}
@@ -34,3 +39,9 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
           {{- end }}
+      {{ if (.Values.storage) }}
+      volumes:
+      - name: {{ .Values.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.name }}
+      {{- end }}
