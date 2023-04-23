@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   namespace: {{ .Values.name}}
   name: {{ .Values.name}}
@@ -39,9 +39,14 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
           {{- end }}
-      {{ if (.Values.storage) }}
-      volumes:
-      - name: {{ .Values.name }}
-        persistentVolumeClaim:
-          claimName: {{ .Values.name }}
-      {{- end }}
+  {{ if (.Values.storage) }}
+  volumeClaimTemplates:
+    - metadata: 
+        name: {{ .Values.name }}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.storage.size }}
+        storageClassName: freenas-nfs-csi
+  {{- end }}
