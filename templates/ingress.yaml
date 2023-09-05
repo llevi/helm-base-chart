@@ -9,7 +9,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-default-https@kubernetescrd
 spec:
   rules:
-  - host: "{{ .Values.name}}.llev.es"
+  - host: "{{ .Values.name}}.llevi.hu"
     http:
       paths:
       - backend:
@@ -21,5 +21,5 @@ spec:
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - "{{ .Values.name}}.llev.es"
-    secretName: "{{ .Values.name}}.llev.es-tls"
+    - "{{ .Values.name}}.llevi.hu"
+    secretName: "{{ .Values.name}}.llevi.hu-tls"
